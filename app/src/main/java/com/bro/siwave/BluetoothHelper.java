@@ -1,19 +1,13 @@
 // BluetoothHelper.java
 package com.bro.siwave;
 
-import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 import android.content.pm.PackageManager;
-import android.os.Handler;
-import android.os.Looper;
+import android.os.SystemClock;
 import android.widget.Toast;
-
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -21,65 +15,108 @@ import java.util.Set;
 import java.util.UUID;
 
 public class BluetoothHelper {
+    private final Activity context;
+    private final Runnable onConnected;
+    private final Runnable onDisconnected;
 
-    private BluetoothAdapter adapter;
+    private BluetoothAdapter bluetoothAdapter;
     private BluetoothSocket socket;
     private OutputStream outputStream;
-    private Context context;
+    private boolean tryingToConnect = false;
 
-    private Runnable onConnectedCallback;
-    private Runnable onDisconnectedCallback;
+    private final String TARGET_DEVICE_NAME = "HC-05"; // Ändere bei Bedarf
+    private final UUID BT_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-    public BluetoothHelper(Context context, Runnable onConnectedCallback, Runnable onDisconnectedCallback) {
+    public BluetoothHelper(Activity context, Runnable onConnected, Runnable onDisconnected) {
         this.context = context;
-        this.onConnectedCallback = onConnectedCallback;
-        this.onDisconnectedCallback = onDisconnectedCallback;
-        adapter = BluetoothAdapter.getDefaultAdapter();
+        this.onConnected = onConnected;
+        this.onDisconnected = onDisconnected;
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     }
 
     public void connectBluetooth() {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions((Activity) context,
-                    new String[]{Manifest.permission.BLUETOOTH_CONNECT},
-                    1001);
+        if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled() || tryingToConnect) {
+            log("Bluetooth nicht verfügbar oder bereits im Verbindungsversuch.");
             return;
         }
 
+        tryingToConnect = true;
+
+        if (context.checkSelfPermission(android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            context.runOnUiThread(() -> Toast.makeText(context, "Bluetooth-Rechte fehlen!", Toast.LENGTH_SHORT).show());
+            tryingToConnect = false;
+            return;
+        }
+
+
         new Thread(() -> {
-            Set<BluetoothDevice> devices = adapter.getBondedDevices();
-            for (BluetoothDevice device : devices) {
-                if (device.getName().startsWith("HC")) {
-                    try {
-                        socket = device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
-                        socket.connect();
-                        outputStream = socket.getOutputStream();
-                        runOnUi(() -> Toast.makeText(context, "Verbunden mit: " + device.getName(), Toast.LENGTH_SHORT).show());
-                        if (onConnectedCallback != null) onConnectedCallback.run();
-                    } catch (IOException e) {
-                        runOnUi(() -> Toast.makeText(context, "Bluetooth-Verbindung fehlgeschlagen", Toast.LENGTH_SHORT).show());
-                        if (onDisconnectedCallback != null) onDisconnectedCallback.run();
-                    }
+            BluetoothDevice targetDevice = null;
+            Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+            for (BluetoothDevice device : pairedDevices) {
+                if (device.getName().equals(TARGET_DEVICE_NAME)) {
+                    targetDevice = device;
                     break;
                 }
+            }
+
+            if (targetDevice == null) {
+                showToast("Bluetooth-Gerät nicht gefunden");
+                log("Zielgerät nicht gefunden.");
+                tryingToConnect = false;
+                return;
+            }
+
+            try {
+                socket = targetDevice.createRfcommSocketToServiceRecord(BT_UUID);
+                socket.connect();
+                outputStream = socket.getOutputStream();
+                log("Bluetooth-Verbindung erfolgreich.");
+                context.runOnUiThread(onConnected);
+            } catch (IOException e) {
+                log("Verbindung fehlgeschlagen: " + e.getMessage());
+                closeConnection();
+                context.runOnUiThread(onDisconnected);
+            } finally {
+                tryingToConnect = false;
             }
         }).start();
     }
 
-    public void sendCommandToArduino(String command) {
-        if (outputStream == null) {
-            runOnUi(() -> Toast.makeText(context, "Kein OutputStream verfügbar", Toast.LENGTH_SHORT).show());
-            return;
+    public boolean sendCommandToArduino(String command) {
+        if (socket == null || outputStream == null) {
+            log("Kann nicht senden – Socket oder OutputStream null");
+            return false;
         }
+
         try {
             outputStream.write(command.getBytes());
+            log("Gesendet: " + command);
+            return true;
         } catch (IOException e) {
-            runOnUi(() -> Toast.makeText(context, "Senden fehlgeschlagen", Toast.LENGTH_SHORT).show());
-            if (onDisconnectedCallback != null) onDisconnectedCallback.run();
+            log("Sende-Fehler: " + e.getMessage());
+            closeConnection();
+            context.runOnUiThread(onDisconnected);
+            return false;
         }
     }
 
-    private void runOnUi(Runnable action) {
-        new Handler(Looper.getMainLooper()).post(action);
+    public void closeConnection() {
+        try {
+            if (outputStream != null) outputStream.close();
+            if (socket != null) socket.close();
+        } catch (IOException e) {
+            log("Fehler beim Schließen: " + e.getMessage());
+        } finally {
+            socket = null;
+            outputStream = null;
+        }
+    }
+
+    private void showToast(String text) {
+        context.runOnUiThread(() -> Toast.makeText(context, text, Toast.LENGTH_SHORT).show());
+    }
+
+    private void log(String msg) {
+        System.out.println("[BluetoothHelper] " + msg);
     }
 }

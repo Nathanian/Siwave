@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -98,23 +99,35 @@ public class MainActivity extends Activity {
             sessionTimeSec -= 30;
             if (sessionTimeSec < MIN_TIME_SEC) sessionTimeSec = MIN_TIME_SEC;
             updateTimerDisplay();
+            if (started && timerRunning) restartTimerWithNewTime();
         });
+
 
         btnRight.setOnClickListener(v -> {
             sessionTimeSec += 30;
             if (sessionTimeSec > MAX_TIME_SEC) sessionTimeSec = MAX_TIME_SEC;
             updateTimerDisplay();
+            if (started && timerRunning) restartTimerWithNewTime();
         });
+
 
         timerText.setOnClickListener(v -> {
             long now = System.currentTimeMillis();
             if (now - lastClickTime < 400) {
-                sessionTimeSec = 300;
-                updateTimerDisplay();
+                if (timerRunning && started) {
+                    countDownTimer.cancel(); // alten Timer abbrechen
+                    sessionTimeSec = 300;
+                    updateTimerDisplay();
+                    startSession(); // neu starten
+                } else {
+                    sessionTimeSec = 300;
+                    updateTimerDisplay();
+                }
                 Toast.makeText(this, "Timer auf 5 Minuten zurückgesetzt", Toast.LENGTH_SHORT).show();
             }
             lastClickTime = now;
         });
+
         ImageButton btnMenu = findViewById(R.id.btnMenu);
         btnMenu.setOnClickListener(v -> {
             Intent intent = new Intent(this, MenuActivity.class);
@@ -142,9 +155,11 @@ public class MainActivity extends Activity {
 
     private void startSession() {
         bluetoothHelper.sendCommandToArduino("#SETDAC:" + frequency + ":!");
+        SystemClock.sleep(100);
         bluetoothHelper.sendCommandToArduino("#SETOPTO:HIGH:!");
-        btnStart.setImageResource(R.drawable.play_d66d6d_red);
-        statusText.setText("Läuft bei " + frequency + " Hz");
+
+        btnStart.setImageResource(R.drawable.stop_d66d6d_red);
+        statusText.setText(frequency + " Hz");
         started = true;
 
         countDownTimer = new CountDownTimer((long) sessionTimeSec * 1000, 1000) {
@@ -164,7 +179,10 @@ public class MainActivity extends Activity {
 
     private void stopSession() {
         bluetoothHelper.sendCommandToArduino("#SETDAC:0:!");
+        SystemClock.sleep(100);
         bluetoothHelper.sendCommandToArduino("#SETOPTO:LOW:!");
+        SystemClock.sleep(100);
+
         btnStart.setImageResource(R.drawable.play_333333_grey);
         statusText.setText("Gestoppt");
         started = false;
@@ -216,4 +234,22 @@ public class MainActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void restartTimerWithNewTime() {
+        countDownTimer.cancel();
+        countDownTimer = new CountDownTimer((long) sessionTimeSec * 1000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                sessionTimeSec = millisUntilFinished / 1000.0;
+                updateTimerDisplay();
+            }
+
+            @Override
+            public void onFinish() {
+                stopSession();
+            }
+        }.start();
+    }
+
+
 }
