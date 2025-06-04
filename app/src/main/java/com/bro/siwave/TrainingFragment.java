@@ -10,30 +10,39 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bro.siwave.bluetooth.BluetoothConnector;
+import com.bro.siwave.session.TrainingSessionManager;
+import com.bro.siwave.session.SessionListener;
+import com.bro.siwave.MainActivity;
+import com.bro.siwave.util.DoubleClickHandler;
+
+
 import androidx.fragment.app.Fragment;
 
 public class TrainingFragment extends Fragment {
 
+    private TextView statusText, timerText;
+    private ImageButton btnStart, btnUp, btnDown, btnLeft, btnRight;
+
     private int frequency = 5;
     private final int MIN_FREQ = 5;
     private final int MAX_FREQ = 28;
+    private int durationSec = 300;
+    private final int MIN_SEC = 60;
+    private final int MAX_SEC = 3600;
 
-    private double sessionTimeSec = 300;
-    private final double MIN_TIME_SEC = 60;
-    private final double MAX_TIME_SEC = 3600;
-
-    private boolean started = false;
-    private boolean timerRunning = false;
     private long lastClickTime = 0;
 
-    private TextView statusText, timerText;
-    private ImageButton btnStart, btnUp, btnDown, btnLeft, btnRight;
-    private CountDownTimer countDownTimer;
+    private DoubleClickHandler doubleClickHandler = new DoubleClickHandler(400);
+
+    private TrainingSessionManager sessionManager;
+    private BluetoothConnector bluetooth;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_training, container, false);
 
+        // Referenzen setzen
         statusText = view.findViewById(R.id.statusText);
         timerText = view.findViewById(R.id.timerText);
         btnStart = view.findViewById(R.id.btnStart);
@@ -43,119 +52,103 @@ public class TrainingFragment extends Fragment {
         btnRight = view.findViewById(R.id.btnRight);
         ImageButton btnMenu = view.findViewById(R.id.btnMenu);
 
-        setButtonsEnabled(false);
-        updateFrequencyDisplay();
-        updateTimerDisplay();
+        bluetooth = MainActivity.bluetoothConnector;
+        sessionManager = MainActivity.trainingSession;
 
-        btnStart.setOnClickListener(v -> {
-            if (!MainActivity.bluetoothHelper.isConnected()) return;
-            if (started) stopSession(); else startSession();
+        sessionManager.setListener(new SessionListener() {
+            @Override public void onTick(int sec) {
+                updateTimerDisplay(sec);
+            }
+
+            @Override public void onFrequencyChanged(int hz) {
+                bluetooth.send("#SETDAC:" + hz + ":!");
+                statusText.setText(String.format("%02d Hz", hz));
+            }
+
+            @Override public void onSessionStarted() {
+                bluetooth.send("#SETOPTO:HIGH:!");
+                btnStart.setImageResource(R.drawable.stop_d66d6d_red);
+            }
+
+            @Override public void onSessionStopped() {
+                bluetooth.send("#SETOPTO:LOW:!");
+                bluetooth.send("#SETDAC:0:!");
+                btnStart.setImageResource(R.drawable.play_333333_grey);
+                statusText.setText("Gestoppt");
+            }
         });
 
-        btnMenu.setOnClickListener(v -> {
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new MenuFragment())
-                    .addToBackStack(null) // optional: Zurück-Taste geht dann zurück
-                    .commit();
+        updateFrequencyDisplay();
+        updateTimerDisplay(durationSec);
+        setButtonsEnabled(bluetooth.isConnected());
+
+        btnStart.setOnClickListener(v -> {
+            if (!bluetooth.isConnected()) return;
+            if (sessionManager.isRunning()) {
+                sessionManager.stop();
+            } else {
+                sessionManager.startFreiesTraining(frequency, durationSec);
+            }
         });
 
         btnUp.setOnClickListener(v -> {
             if (frequency < MAX_FREQ) frequency++;
             updateFrequencyDisplay();
-            if (started) MainActivity.bluetoothHelper.sendCommandToArduino("#SETDAC:" + frequency + ":!");
+            if (sessionManager.isRunning()) {
+                bluetooth.send("#SETDAC:" + frequency + ":!");
+            }
         });
 
         btnDown.setOnClickListener(v -> {
             if (frequency > MIN_FREQ) frequency--;
             updateFrequencyDisplay();
-            if (started) MainActivity.bluetoothHelper.sendCommandToArduino("#SETDAC:" + frequency + ":!");
+            if (sessionManager.isRunning()) {
+                bluetooth.send("#SETDAC:" + frequency + ":!");
+            }
         });
 
         btnLeft.setOnClickListener(v -> {
-            sessionTimeSec = Math.max(sessionTimeSec - 30, MIN_TIME_SEC);
-            updateTimerDisplay();
-            if (started && timerRunning) restartTimerWithNewTime();
+            durationSec = Math.max(durationSec - 30, MIN_SEC);
+            updateTimerDisplay(durationSec);
         });
 
         btnRight.setOnClickListener(v -> {
-            sessionTimeSec = Math.min(sessionTimeSec + 30, MAX_TIME_SEC);
-            updateTimerDisplay();
-            if (started && timerRunning) restartTimerWithNewTime();
+            durationSec = Math.min(durationSec + 30, MAX_SEC);
+            updateTimerDisplay(durationSec);
         });
 
         timerText.setOnClickListener(v -> {
-            long now = System.currentTimeMillis();
-            if (now - lastClickTime < 400) {
-                if (started && timerRunning) {
-                    countDownTimer.cancel();
-                    sessionTimeSec = 300;
-                    updateTimerDisplay();
-                    startSession();
-                } else {
-                    sessionTimeSec = 300;
-                    updateTimerDisplay();
+            if (doubleClickHandler.isDoubleClick()) {
+                durationSec = 300;
+                updateTimerDisplay(durationSec);
+                if (sessionManager.isRunning()) {
+                    sessionManager.startFreiesTraining(frequency, durationSec); // restart
                 }
                 Toast.makeText(getContext(), "Timer auf 5 Minuten zurückgesetzt", Toast.LENGTH_SHORT).show();
             }
-            lastClickTime = now;
+        });
+
+
+        btnMenu.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, new MenuFragment())
+                    .addToBackStack(null)
+                    .commit();
         });
 
         checkBluetoothStatus();
-
         return view;
-    }
-
-    private void checkBluetoothStatus() {
-        if (!MainActivity.bluetoothHelper.isConnected() && !MainActivity.bluetoothHelper.isTryingToConnect()) {
-            Toast.makeText(getContext(), "Bluetooth-Verbindung wird aufgebaut...", Toast.LENGTH_SHORT).show();
-            MainActivity.bluetoothHelper.connectBluetooth();
-        } else if (MainActivity.bluetoothHelper.isConnected()) {
-            setButtonsEnabled(true);
-        }
-    }
-
-    private void startSession() {
-        MainActivity.bluetoothHelper.sendCommandToArduino("#SETDAC:" + frequency + ":!");
-        SystemClock.sleep(100);
-        MainActivity.bluetoothHelper.sendCommandToArduino("#SETOPTO:HIGH:!");
-
-        btnStart.setImageResource(R.drawable.stop_d66d6d_red);
-        statusText.setText(frequency + " Hz");
-        started = true;
-
-        countDownTimer = new CountDownTimer((long) sessionTimeSec * 1000, 1000) {
-            @Override public void onTick(long millisUntilFinished) {
-                sessionTimeSec = millisUntilFinished / 1000.0;
-                updateTimerDisplay();
-            }
-            @Override public void onFinish() { stopSession(); }
-        }.start();
-        timerRunning = true;
-    }
-
-    private void stopSession() {
-        MainActivity.bluetoothHelper.sendCommandToArduino("#SETDAC:0:!");
-        SystemClock.sleep(100);
-        MainActivity.bluetoothHelper.sendCommandToArduino("#SETOPTO:LOW:!");
-
-        btnStart.setImageResource(R.drawable.play_333333_grey);
-        statusText.setText("Gestoppt");
-        started = false;
-
-        if (timerRunning) {
-            countDownTimer.cancel();
-            timerRunning = false;
-        }
     }
 
     private void updateFrequencyDisplay() {
         statusText.setText(String.format("%02d Hz", frequency));
     }
 
-    private void updateTimerDisplay() {
-        int minutes = (int) (sessionTimeSec / 60);
-        int seconds = (int) (sessionTimeSec % 60);
-        timerText.setText(String.format("%02d : %02d", minutes, seconds));
+    private void updateTimerDisplay(int sec) {
+        int min = sec / 60;
+        int rest = sec % 60;
+        timerText.setText(String.format("%02d : %02d", min, rest));
     }
 
     private void setButtonsEnabled(boolean enabled) {
@@ -166,14 +159,13 @@ public class TrainingFragment extends Fragment {
         btnRight.setEnabled(enabled);
     }
 
-    private void restartTimerWithNewTime() {
-        countDownTimer.cancel();
-        countDownTimer = new CountDownTimer((long) sessionTimeSec * 1000, 1000) {
-            @Override public void onTick(long millisUntilFinished) {
-                sessionTimeSec = millisUntilFinished / 1000.0;
-                updateTimerDisplay();
-            }
-            @Override public void onFinish() { stopSession(); }
-        }.start();
+    private void checkBluetoothStatus() {
+        if (!bluetooth.isConnected() && !bluetooth.isTryingToConnect()) {
+            Toast.makeText(getContext(), "Bluetooth-Verbindung wird aufgebaut...", Toast.LENGTH_SHORT).show();
+            bluetooth.connect();
+        } else if (bluetooth.isConnected()) {
+            setButtonsEnabled(true);
+        }
     }
+
 }
