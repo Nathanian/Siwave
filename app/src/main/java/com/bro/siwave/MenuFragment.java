@@ -12,6 +12,7 @@ import android.widget.CheckBox;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import com.bro.siwave.ui.preset.PresetFragment;
 
 public class MenuFragment extends Fragment {
 
@@ -30,6 +31,7 @@ public class MenuFragment extends Fragment {
         Button btnStartTraining = view.findViewById(R.id.btn_start_training);
         Button btnExit = view.findViewById(R.id.btn_exit);
         Button btnVideo = view.findViewById(R.id.btnVideo);
+        Button btnPresets = view.findViewById(R.id.btnPresets);
 
         // Lade gespeicherten Zustand
         SharedPreferences prefs = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -43,6 +45,14 @@ public class MenuFragment extends Fragment {
         btnVideo.setOnClickListener(v -> {
             getParentFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new VideoFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
+
+        btnPresets.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, new PresetFragment())
                     .addToBackStack(null)
                     .commit();
         });

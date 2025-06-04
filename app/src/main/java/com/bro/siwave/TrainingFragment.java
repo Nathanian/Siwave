@@ -65,12 +65,14 @@ public class TrainingFragment extends Fragment {
                 statusText.setText(String.format("%02d Hz", hz));
             }
 
+
             @Override public void onSessionStarted() {
                 bluetooth.send("#SETOPTO:HIGH:!");
                 btnStart.setImageResource(R.drawable.stop_d66d6d_red);
             }
 
-            @Override public void onSessionStopped() {
+            @Override
+            public void onStopped() {
                 bluetooth.send("#SETOPTO:LOW:!");
                 bluetooth.send("#SETDAC:0:!");
                 btnStart.setImageResource(R.drawable.play_333333_grey);

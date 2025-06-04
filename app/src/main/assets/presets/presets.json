@@ -1,0 +1,18 @@
+[
+  {
+    "name": "Grundprogramm 1",
+    "duration": 300,
+    "steps": [
+      { "after": 60, "action": "up 2" },
+      { "after": 180, "action": "down 1" }
+    ]
+  },
+  {
+    "name": "Power Boost",
+    "duration": 120,
+    "steps": [
+      { "after": 30, "action": "up 5" },
+      { "after": 90, "action": "down 3" }
+    ]
+  }
+]
