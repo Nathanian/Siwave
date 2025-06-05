@@ -29,6 +29,12 @@
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
 
+        <service
+            android:name=".bluetooth.BluetoothService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
+
+
         <activity
             android:name=".MainActivity"
             android:screenOrientation="landscape"
