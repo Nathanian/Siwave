@@ -5,6 +5,8 @@
     android:id="@+id/menu_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/v7"
+
     android:padding="32dp"
     tools:context=".menu.MenuFragment">
 
@@ -26,7 +28,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.026" />
 
     <LinearLayout
         android:id="@+id/button_container"
@@ -47,11 +49,14 @@
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:text="Freies Training"
+        android:textColorLink="#000000"
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/btnVideo"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/checkbox_start_with_training" />
+        app:layout_constraintTop_toBottomOf="@+id/checkbox_start_with_training"
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/btn_exit"
@@ -61,8 +66,10 @@
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnVideo" />
+        app:layout_constraintTop_toBottomOf="@+id/button_container"
+        app:layout_constraintVertical_bias="0.976" />
 
     <Button
         android:id="@+id/btnVideo"
@@ -71,21 +78,34 @@
         android:text="Trainingsvideos"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.322"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/button_container"
-        app:layout_constraintVertical_bias="0.258" />
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/btnYoutube"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="YouTube Galerie"
+        app:layout_constraintBottom_toTopOf="@+id/btn_exit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.091"
+        app:layout_constraintStart_toEndOf="@+id/btnVideo"
+        app:layout_constraintTop_toBottomOf="@+id/btnPresets" />
 
     <Button
         android:id="@+id/btnPresets"
-        android:layout_width="382dp"
-        android:layout_height="39dp"
+        android:layout_width="227dp"
+        android:layout_height="57dp"
         android:layout_marginTop="64dp"
         android:layout_marginBottom="11dp"
         android:text="Vordefinierte Trainings"
         app:layout_constraintBottom_toTopOf="@+id/btnVideo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/btn_start_training" />
+        app:layout_constraintTop_toTopOf="@+id/btn_start_training"
+        app:layout_constraintVertical_bias="0.0" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

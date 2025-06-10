@@ -36,6 +36,7 @@ public class MenuFragment extends Fragment {
         Button btnExit = view.findViewById(R.id.btn_exit);
         Button btnVideo = view.findViewById(R.id.btnVideo);
         Button btnPresets = view.findViewById(R.id.btnPresets);
+        Button btnYoutube = view.findViewById(R.id.btnYoutube);
 
         // Lade gespeicherten Zustand
         SharedPreferences prefs = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -53,7 +54,13 @@ public class MenuFragment extends Fragment {
                     .addToBackStack(null)
                     .commit();
         });
-
+        btnYoutube.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, new com.bro.siwave.video.YoutubeFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
 
         btnPresets.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager()

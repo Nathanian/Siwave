@@ -20,7 +20,7 @@ import com.bro.siwave.R;public class FullscreenVideoActivity extends AppCompatAc
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fullscren_video);
+        setContentView(R.layout.activity_fullscreen_video);
 
         playerView = findViewById(R.id.player_view);
         btnClose = findViewById(R.id.btn_close);

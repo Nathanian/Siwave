@@ -13,8 +13,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:controller_auto_show="true"
-        app:controller_show_timeout_ms="3000"
+
         app:resize_mode="fit"
         android:keepScreenOn="true" />
 
