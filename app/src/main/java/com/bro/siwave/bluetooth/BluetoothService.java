@@ -1,6 +1,8 @@
 package com.bro.siwave.bluetooth;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
@@ -25,6 +27,19 @@ public class BluetoothService extends Service {
         super.onCreate();
         Log.d("BluetoothService", "BluetoothService gestartet");
 
+        // NEU: NotificationChannel erstellen
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "Bluetooth Service",
+                    NotificationManager.IMPORTANCE_LOW
+            );
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
+            }
+        }
+
         bluetoothManager = new BluetoothManager(getApplicationContext(), new BluetoothManager.Listener() {
             @Override
             public void onConnected() {
@@ -41,7 +56,6 @@ public class BluetoothService extends Service {
             }
         });
 
-        // Kleiner Delay hilft gegen Race Conditions beim Appstart
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             Log.d("BluetoothService", "Starte Verbindung...");
             bluetoothManager.connect();
@@ -58,6 +72,7 @@ public class BluetoothService extends Service {
 
         startForeground(NOTIFICATION_ID, notification);
     }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
