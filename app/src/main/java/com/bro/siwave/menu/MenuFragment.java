@@ -16,7 +16,7 @@ import androidx.fragment.app.Fragment;
 import com.bro.siwave.R;
 import com.bro.siwave.training.TrainingFragment;
 import com.bro.siwave.ui.preset.PresetFragment;
-import com.bro.siwave.video.VideoFragment;
+import com.bro.siwave.video.VideoLibraryFragment;
 
 public class MenuFragment extends Fragment {
 
@@ -47,11 +47,13 @@ public class MenuFragment extends Fragment {
         });
 
         btnVideo.setOnClickListener(v -> {
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new VideoFragment())
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, new com.bro.siwave.video.VideoLibraryFragment())
                     .addToBackStack(null)
                     .commit();
         });
+
 
         btnPresets.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager()
