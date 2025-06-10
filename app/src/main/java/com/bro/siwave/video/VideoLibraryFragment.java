@@ -5,47 +5,58 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.fragment.app.Fragment;
 
 import com.bro.siwave.R;
 
-import java.util.Arrays;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
-public class VideoLibraryFragment extends Fragment {
+public class VideoLibraryFragment extends Fragment implements VideoAdapter.OnVideoClickListener {
 
-    private final List<VideoItem> videos = Arrays.asList(
-            new VideoItem(R.raw.schwingen_mit_der_sinuswelle, "Einführung")
-            // weitere Videos bei Bedarf
-    );
+    private final List<VideoItem> videos = new ArrayList<>();
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_video_library, container, false);
-        LinearLayout list = root.findViewById(R.id.video_list);
 
-        for (VideoItem video : videos) {
-            View item = inflater.inflate(R.layout.item_video, list, false);
-            TextView title = item.findViewById(R.id.video_title);
-            ImageView thumb = item.findViewById(R.id.thumbnail);
+    @Nullable
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_video_library, container, false);
 
-            title.setText(video.title);
-            thumb.setImageResource(R.drawable.ic_menu_333); // Platzhalter-Bild
+        loadVideos();
 
-            item.setOnClickListener(v -> {
-                Intent intent = new Intent(requireContext(), FullscreenVideoActivity.class);
-                intent.putExtra("videoResId", video.resId);
-                startActivity(intent);
-            });
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerVideos);
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        recyclerView.setAdapter(new VideoAdapter(videos, this));
 
-            list.addView(item);
+        return view;
+    }
+
+    private void loadVideos() {
+        videos.clear();
+        Field[] fields = R.raw.class.getFields();
+        for (Field field : fields) {
+            try {
+                int id = field.getInt(null);
+                String name = field.getName().replace('_', ' ');
+                if (!name.isEmpty()) {
+                    name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
+                }
+                videos.add(new VideoItem(id, name));
+            } catch (IllegalAccessException ignored) {
+            }
         }
-
-        return root;
+    }
+    @Override
+    public void onVideoClick(VideoItem item) {
+        Intent intent = new Intent(requireContext(), FullscreenVideoActivity.class);
+        intent.putExtra("videoResId", item.resId);
+        startActivity(intent);
     }
 }
+

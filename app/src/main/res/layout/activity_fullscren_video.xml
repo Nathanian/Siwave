@@ -17,4 +17,14 @@
         app:controller_show_timeout_ms="3000"
         app:resize_mode="fit"
         android:keepScreenOn="true" />
+
+    <ImageButton
+        android:id="@+id/btn_close"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@android:color/transparent"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="@string/close"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
