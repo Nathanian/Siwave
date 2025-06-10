@@ -1,5 +1,5 @@
 // VideoFragment.java
-package com.bro.siwave;
+package com.bro.siwave.video;
 
 import android.content.res.AssetManager;
 import android.os.Bundle;
@@ -12,6 +12,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bro.siwave.R;
 
 import java.io.IOException;
 import java.util.ArrayList;

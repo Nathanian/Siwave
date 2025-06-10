@@ -1,5 +1,5 @@
 // VideoPlayerFragment.java
-package com.bro.siwave;
+package com.bro.siwave.video;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +12,8 @@ import android.widget.VideoView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.bro.siwave.R;
 
 public class VideoPlayerFragment extends Fragment {
 

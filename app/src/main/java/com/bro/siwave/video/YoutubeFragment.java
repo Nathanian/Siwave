@@ -1,4 +1,4 @@
-package com.bro.siwave;
+package com.bro.siwave.video;
 
 public class YoutubeFragment {
 }

@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bro.siwave.R;
-import com.bro.siwave.TrainingFragment;
+import com.bro.siwave.training.TrainingFragment;
 import com.bro.siwave.preset.PresetLoader;
 import com.bro.siwave.preset.PresetProgram;
 import com.bro.siwave.session.TrainingSessionManager;

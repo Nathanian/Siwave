@@ -1,5 +1,5 @@
 // VideoAdapter.java
-package com.bro.siwave;
+package com.bro.siwave.video;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bro.siwave.R;
 
 import java.util.List;
 

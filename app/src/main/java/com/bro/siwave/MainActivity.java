@@ -7,7 +7,9 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import com.bro.siwave.bluetooth.BluetoothService;
+import com.bro.siwave.menu.MenuFragment;
 import com.bro.siwave.session.TrainingSessionManager;
+import com.bro.siwave.training.TrainingFragment;
 
 public class MainActivity extends AppCompatActivity {
     public static TrainingSessionManager trainingSession;

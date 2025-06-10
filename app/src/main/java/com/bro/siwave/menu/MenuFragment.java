@@ -1,4 +1,4 @@
-package com.bro.siwave;
+package com.bro.siwave.menu;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -12,7 +12,11 @@ import android.widget.CheckBox;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.bro.siwave.R;
+import com.bro.siwave.training.TrainingFragment;
 import com.bro.siwave.ui.preset.PresetFragment;
+import com.bro.siwave.video.VideoFragment;
 
 public class MenuFragment extends Fragment {
 

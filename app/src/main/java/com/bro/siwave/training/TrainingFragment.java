@@ -1,4 +1,4 @@
-package com.bro.siwave;
+package com.bro.siwave.training;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +11,9 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import com.bro.siwave.MainActivity;
+import com.bro.siwave.menu.MenuFragment;
+import com.bro.siwave.R;
 import com.bro.siwave.bluetooth.BluetoothManager;
 import com.bro.siwave.bluetooth.BluetoothService;
 import com.bro.siwave.session.SessionListener;
