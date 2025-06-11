@@ -34,6 +34,8 @@ public class MenuFragment extends Fragment {
         checkboxStartWithTraining = view.findViewById(R.id.checkbox_start_with_training);
         Button btnStartTraining = view.findViewById(R.id.btn_start_training);
         Button btnExit = view.findViewById(R.id.btn_exit);
+        Button btnMinimize = view.findViewById(R.id.btn_minimize);
+
         Button btnVideo = view.findViewById(R.id.btnVideo);
         Button btnPresets = view.findViewById(R.id.btnPresets);
         Button btnYoutube = view.findViewById(R.id.btnYoutube);
@@ -78,6 +80,8 @@ public class MenuFragment extends Fragment {
                     .addToBackStack(null)
                     .commit();
         });
+
+        btnMinimize.setOnClickListener(v -> requireActivity().moveTaskToBack(true));
 
         btnExit.setOnClickListener(v -> {
             requireActivity().finishAffinity(); // schließt alle Activities

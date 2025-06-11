@@ -10,7 +10,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.fragment.app.Fragment;
+
+
+import android.widget.ImageButton;
+
+import com.bro.siwave.menu.MenuFragment;
 
 import com.bro.siwave.R;
 
@@ -33,6 +37,13 @@ public class VideoLibraryFragment extends Fragment implements VideoAdapter.OnVid
         RecyclerView recyclerView = view.findViewById(R.id.recyclerVideos);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         recyclerView.setAdapter(new VideoAdapter(videos, this));
+
+        ImageButton btnExit = view.findViewById(R.id.btnExit);
+        btnExit.setOnClickListener(v ->
+                requireActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, new MenuFragment())
+                        .commit());
 
         return view;
     }

@@ -1,6 +1,6 @@
 package com.bro.siwave.video;
 
-import androidx.fragment.app.Fragment;
+
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -15,6 +15,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.widget.ImageButton;
+import com.bro.siwave.menu.MenuFragment;
 
 import com.bro.siwave.R;
 
@@ -37,6 +40,13 @@ public class YoutubeFragment extends Fragment implements YoutubeAdapter.OnVideoC
         RecyclerView recyclerView = view.findViewById(R.id.recyclerYoutube);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         recyclerView.setAdapter(new YoutubeAdapter(videos, this));
+
+        ImageButton btnExit = view.findViewById(R.id.btnExit);
+        btnExit.setOnClickListener(v ->
+                requireActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, new MenuFragment())
+                        .commit());
 
         return view;
     }

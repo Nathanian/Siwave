@@ -17,6 +17,9 @@ import com.bro.siwave.preset.PresetLoader;
 import com.bro.siwave.preset.PresetProgram;
 import com.bro.siwave.session.TrainingSessionManager;
 
+import android.widget.ImageButton;
+import com.bro.siwave.menu.MenuFragment;
+
 import java.util.List;
 
 public class PresetFragment extends Fragment {
@@ -39,6 +42,14 @@ public class PresetFragment extends Fragment {
         });
 
         recyclerView.setAdapter(adapter);
+
+        ImageButton btnExit = view.findViewById(R.id.btnExit);
+        btnExit.setOnClickListener(v ->
+                requireActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, new MenuFragment())
+                        .commit());
+
         return view;
     }
 }

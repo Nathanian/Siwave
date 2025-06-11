@@ -23,7 +23,7 @@ import com.bro.siwave.util.DoubleClickHandler;
 public class TrainingFragment extends Fragment {
 
     private TextView statusText, timerText;
-    private ImageButton btnStart, btnUp, btnDown, btnLeft, btnRight;
+    private ImageButton btnStart, btnUp, btnDown, btnLeft, btnRight, btnExit;
 
     private int frequency = 5;
     private final int MIN_FREQ = 5;
@@ -50,7 +50,9 @@ public class TrainingFragment extends Fragment {
         btnDown = view.findViewById(R.id.btnDown);
         btnLeft = view.findViewById(R.id.btnLeft);
         btnRight = view.findViewById(R.id.btnRight);
-        ImageButton btnMenu = view.findViewById(R.id.btnMenu);
+       // ImageButton btnMenu = view.findViewById(R.id.btnMenu);
+        btnExit = view.findViewById(R.id.btnExit);
+
 
         // Logik
         bluetooth = BluetoothService.getBluetoothManager();
@@ -142,7 +144,7 @@ public class TrainingFragment extends Fragment {
             }
         });
 
-        btnMenu.setOnClickListener(v -> {
+        btnExit.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container, new MenuFragment())

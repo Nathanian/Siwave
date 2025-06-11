@@ -126,7 +126,7 @@
         android:scaleType="fitCenter"/>
 
     <ImageButton
-        android:id="@+id/btnMenu"
+        android:id="@+id/btnExit"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:background="@android:color/transparent"
@@ -134,7 +134,7 @@
         android:scaleType="fitCenter"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="Menü öffnen"/>
+        android:contentDescription="@string/close"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

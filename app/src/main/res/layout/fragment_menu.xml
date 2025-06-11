@@ -28,7 +28,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.026" />
+        app:layout_constraintVertical_bias="0.05" />
 
     <LinearLayout
         android:id="@+id/button_container"
@@ -59,6 +59,18 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <Button
+        android:id="@+id/btn_minimize"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Minimieren"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/btn_exit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnYoutube" />
+
+    <Button
         android:id="@+id/btn_exit"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
@@ -68,8 +80,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.501"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_container"
-        app:layout_constraintVertical_bias="0.976" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_minimize" />
 
     <Button
         android:id="@+id/btnVideo"
@@ -77,8 +88,8 @@
         android:layout_height="wrap_content"
         android:text="Trainingsvideos"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.322"
+        app:layout_constraintEnd_toEndOf="@+id/button_container"
+        app:layout_constraintHorizontal_bias="0.908"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/button_container"
         app:layout_constraintVertical_bias="0.0" />
@@ -90,9 +101,10 @@
         android:text="YouTube Galerie"
         app:layout_constraintBottom_toTopOf="@+id/btn_exit"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.091"
+        app:layout_constraintHorizontal_bias="0.203"
         app:layout_constraintStart_toEndOf="@+id/btnVideo"
-        app:layout_constraintTop_toBottomOf="@+id/btnPresets" />
+        app:layout_constraintTop_toBottomOf="@+id/btnPresets"
+        app:layout_constraintVertical_bias="0.515" />
 
     <Button
         android:id="@+id/btnPresets"
