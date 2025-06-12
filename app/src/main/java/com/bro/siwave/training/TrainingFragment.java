@@ -84,6 +84,7 @@ public class TrainingFragment extends Fragment {
             public void onSessionStarted() {
                 bluetooth.send("#SETOPTO:HIGH:!");
                 btnStart.setImageResource(R.drawable.stop_d66d6d_red);
+                updateButtonStates();
             }
 
             @Override
@@ -92,6 +93,7 @@ public class TrainingFragment extends Fragment {
                 bluetooth.send("#SETDAC:0:!");
                 btnStart.setImageResource(R.drawable.play_333333_grey);
                 statusText.setText("Gestoppt");
+                updateButtonStates();
             }
         });
 
@@ -100,7 +102,8 @@ public class TrainingFragment extends Fragment {
 
 
         // Button-Logik
-        setButtonsEnabled(bluetooth != null && bluetooth.isConnected());
+        updateButtonStates();
+
 
         btnStart.setOnClickListener(v -> {
             if (!bluetooth.isConnected()) return;
@@ -172,4 +175,14 @@ public class TrainingFragment extends Fragment {
         btnLeft.setEnabled(enabled);
         btnRight.setEnabled(enabled);
     }
-}
+        private void updateButtonStates() {
+            boolean connected = bluetooth != null && bluetooth.isConnected();
+            btnStart.setEnabled(connected);
+
+            boolean allowAdjust = connected && !(sessionManager.isRunning() && sessionManager.isPresetTraining());
+            btnUp.setEnabled(allowAdjust);
+            btnDown.setEnabled(allowAdjust);
+            btnLeft.setEnabled(allowAdjust);
+            btnRight.setEnabled(allowAdjust);
+        }
+    }
