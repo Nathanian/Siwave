@@ -2,4 +2,6 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!-- Unified button color used across fragments -->
+    <color name="button_gray">#333333</color>
 </resources>
