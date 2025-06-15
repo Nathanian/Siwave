@@ -1,9 +1,11 @@
 package com.bro.siwave.video;
-
+import android.content.res.AssetFileDescriptor;
+import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android  .widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -38,7 +40,20 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
     public void onBindViewHolder(@NonNull VideoViewHolder holder, int position) {
         VideoItem item = videos.get(position);
         holder.title.setText(item.title);
-        holder.thumb.setImageResource(R.drawable.ic_menu_333);
+
+
+        try {
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            AssetFileDescriptor afd = holder.itemView.getContext()
+                    .getResources().openRawResourceFd(item.resId);
+            retriever.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            Bitmap frame = retriever.getFrameAtTime(0);
+            holder.thumb.setImageBitmap(frame);
+            retriever.release();
+            afd.close();
+        } catch (Exception e) {
+            holder.thumb.setImageResource(R.drawable.ic_menu_333);
+        }
         holder.itemView.setOnClickListener(v -> listener.onVideoClick(item));
     }
 
